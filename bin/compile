@@ -17,6 +17,7 @@
 # ------------------------------------------------------------------------------
 # fail fast
 set -e
+set -x
 # ==============================================================================
 
 
@@ -59,7 +60,6 @@ LP_DIR=`cd $(dirname $0); cd ..; pwd`
 ################################################################################
 # FUNCTIONS
 ################################################################################
-
 # ==============================================================================
 # Check if a value exists in an array
 # ------------------------------------------------------------------------------
@@ -69,7 +69,7 @@ LP_DIR=`cd $(dirname $0); cd ..; pwd`
 # Usage: in_array "$needle" "${haystack[@]}"
 # See: http://fvue.nl/wiki/Bash:_Check_if_array_element_exists
 # ------------------------------------------------------------------------------
-in_array() {
+in_array(){
     local hay needle=$1
     shift
     for hay; do
@@ -84,7 +84,7 @@ in_array() {
 # ==============================================================================
 # Prepare for action
 # ------------------------------------------------------------------------------
-function preRun() {
+function preRun(){
     # include .files when moving things around
     shopt -s dotglob
 
@@ -97,7 +97,7 @@ function preRun() {
 # ==============================================================================
 # move app things to www
 # ------------------------------------------------------------------------------
-function moveAppToWebRoot() {
+function moveAppToWebRoot(){
     mkdir -p $CACHE_DIR/www
 
     for sItem in $( ls ); do
@@ -117,18 +117,19 @@ function moveAppToWebRoot() {
 # ==============================================================================
 # Install Apache
 # ------------------------------------------------------------------------------
-function installApache() {
-    echo "-----> Bundling Apache version $APACHE_VERSION"
-    curl --silent --max-time 60 --location "$APACHE_URL" | tar xz
+function installApache(){
+    echo "-----> Bundling Apache version ${APACHE_VERSION}"
+    curl --silent --max-time 60 --location "${APACHE_URL}" | tar xz
+}
 # ==============================================================================
 
 
 # ==============================================================================
 # Install PHP
 # ------------------------------------------------------------------------------
-function installPhp() {
-    echo "-----> Bundling PHP version $PHP_VERSION"
-    curl --silent --max-time 60 --location "$PHP_URL" | tar xz
+function installPhp(){
+    echo "-----> Bundling PHP version ${PHP_VERSION}"
+    curl --silent --max-time 60 --location "${PHP_URL}" | tar xz
 }
 # ==============================================================================
 
@@ -136,7 +137,7 @@ function installPhp() {
 # ==============================================================================
 # update config files
 # ------------------------------------------------------------------------------
-function updateConfig() {
+function updateConfig(){
     cp $LP_DIR/conf/httpd.conf $APACHE_PATH/conf
     cp $LP_DIR/conf/php.ini php
 }
@@ -146,7 +147,7 @@ function updateConfig() {
 # ==============================================================================
 # make php available on bin
 # ------------------------------------------------------------------------------
-function linkBinaries() {
+function linkBinaries(){
     mkdir -p bin
     ln -s /app/php/bin/php bin/php
 }
@@ -156,7 +157,7 @@ function linkBinaries() {
 # ==============================================================================
 # check if we have Composer dependencies and vendors are not bundled
 # ------------------------------------------------------------------------------
-function runComposer() {
+function runComposer(){
     if [ -f www/composer.json ] && [ ! -d www/vendor ]; then
       GIT_DIR_ORIG=$GIT_DIR
       unset GIT_DIR
@@ -177,8 +178,8 @@ function runComposer() {
 # ==============================================================================
 # Setup boot file that runs our web worker
 # ------------------------------------------------------------------------------
-function createBootScript() {
-    cat >>boot.sh <<EOF
+function createBootScript(){
+    cat >> boot.sh <<EOF
     for var in \`env|cut -f1 -d=\`; do
       echo "PassEnv \$var" >> /app/apache/conf/httpd.conf;
     done
@@ -200,7 +201,7 @@ EOF
 # ==============================================================================
 # Clean up after ourselves
 # ------------------------------------------------------------------------------
-function postRun() {
+function postRun(){
     # clean the cache
     rm -rf $CACHE_DIR/*
 } 
@@ -210,7 +211,7 @@ function postRun() {
 # ==============================================================================
 # On your places... Set... Go!
 # ------------------------------------------------------------------------------
-function run () {
+function run (){
     moveAppToWebRoot
 
     installApache
