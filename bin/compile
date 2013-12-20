@@ -256,10 +256,6 @@ function runComposer(){
 
       echo "       -----> Running Composer "
 
-      echo "LD_LIBRARY_PATH = ${LD_LIBRARY_PATH}"
-      echo "BUILD_DIR       = ${BUILD_DIR}"
-      echo "`ls -lR ${BUILD_DIR}`"
-
       #LD_LIBRARY_PATH=$BUILD_DIR/php $BUILD_DIR/php/bin/php -c $LP_DIR/conf/php.ini composer.phar install --prefer-source
       LD_LIBRARY_PATH=$BUILD_DIR/php/include/php/ext $BUILD_DIR/php/bin/php -c $LP_DIR/conf/php.ini composer.phar install --prefer-source
 
