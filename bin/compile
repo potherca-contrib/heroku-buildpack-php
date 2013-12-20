@@ -115,9 +115,9 @@ function moveAppToWebRoot(){
     #    echo "     ERROR> Could not find a 'www' directory in `pwd`"
     #fi
 
-    #for sItem in $( ls ); do
-    #    in_array "${sItem}" "${aKeep[@]}" || mv "${sItem}" "${CACHE_DIR}/www"
-    #done
+    for sItem in $( ls ); do
+        in_array "${sItem}" "${aKeep[@]}" || mv -v "${sItem}" "${CACHE_DIR}/www"
+    done
 
     mv $CACHE_DIR/www .
 
