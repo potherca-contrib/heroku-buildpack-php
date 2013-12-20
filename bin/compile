@@ -135,7 +135,7 @@ function installPhp(){
 # update config files
 # ------------------------------------------------------------------------------
 function updateConfig(){
-    echo "-----> Updating config filus"
+    echo "-----> Updating config files"
     cp $LP_DIR/conf/httpd.conf $APACHE_PATH/conf
     cp $LP_DIR/conf/php.ini php
 }
