@@ -185,6 +185,8 @@ function createBootScript(){
     echo "-----> Creating boot script"
     # @FIXME: We should check the project files for post-install/boot commands and add those too!
     cat >> boot.sh <<EOF
+    echo "=====> Running Script ${0}"
+
     for var in \`env|cut -f1 -d=\`; do
       echo "PassEnv \$var" >> /app/apache/conf/httpd.conf;
     done
