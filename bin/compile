@@ -281,20 +281,17 @@ function createBootScript(){
     if [ -f /app/www/composer.json ] && [ ! -d /app/www/vendor ]; then
         echo "       -----> Composer dependencies found"
         COMPOSER_URL="http://getcomposer.org/composer.phar"
-        #GIT_DIR_ORIG=$GIT_DIR
-        #unset GIT_DIR
 
         echo "       -----> Fetching Composer"
         curl --silent --max-time 60 --location "$COMPOSER_URL" > /app/www/composer.phar
-        cd /app/www
 
         echo "       -----> Running Composer"
+        cd /app/www
         /app/bin/php composer.phar install --prefer-source
+        ls -lR
 
         echo "       -----> Cleaning up after Composer"
-        #rm -rf vendor/**/.git
         rm /app/www/composer.phar
-        #export GIT_DIR=$GIT_DIR_ORIG
     fi
 
     for var in \`env|cut -f1 -d=\`; do
