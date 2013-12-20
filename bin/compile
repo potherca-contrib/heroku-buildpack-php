@@ -289,7 +289,7 @@ function createBootScript(){
         pwd
         cd /app/www
         pwd
-        /app/bin/php composer.phar install -v --prefer-source
+        /app/bin/php composer.phar install -vvv --prefer-source
         ls -lR
 
         echo "       -----> Cleaning up after Composer"
