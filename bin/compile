@@ -277,25 +277,6 @@ function createBootScript(){
     cat >> boot.sh <<EOF
     echo "=====> Running Boot Script"
 
-    echo "-----> Checking for Composer dependencies"
-    if [ -f /app/www/composer.json ] && [ ! -d /app/www/vendor ]; then
-        echo "       -----> Composer dependencies found"
-        COMPOSER_URL="http://getcomposer.org/composer.phar"
-
-        echo "       -----> Fetching Composer"
-        curl --silent --max-time 60 --location "$COMPOSER_URL" > /app/www/composer.phar
-
-        echo "       -----> Running Composer"
-        pwd
-        cd /app/www
-        pwd
-        /app/bin/php composer.phar install -vvv --prefer-source
-        ls -lR
-
-        echo "       -----> Cleaning up after Composer"
-        rm /app/www/composer.phar
-    fi
-
     for var in \`env|cut -f1 -d=\`; do
       echo "PassEnv \$var" >> /app/apache/conf/httpd.conf;
     done
@@ -333,22 +314,10 @@ function run (){
     echo "=====> Running Install"
     moveAppToWebRoot
 
-    #installMcrypt
-    #installApache
-    #installPhp
-#MCRYPT_URL="https://heroku-buildpack-php.s3.amazonaws.com/mcrypt-""$MCRYPT_VERSION""$heroku_rev"".tar.gz"
-echo "-----> Bundling mcrypt version $MCRYPT_VERSION"
-curl --silent --max-time 60 --location "$MCRYPT_URL" | tar xz
-
-#APACHE_URL="https://heroku-buildpack-php.s3.amazonaws.com/apache-""$APACHE_VERSION""$heroku_rev"".tar.gz"
-echo "-----> Bundling Apache version $APACHE_VERSION"
-curl --silent --max-time 60 --location "$APACHE_URL" | tar xz
-
-#PHP_URL="https://heroku-buildpack-php.s3.amazonaws.com/php-$PHP_VERSION""$heroku_rev"".tar.gz"
-echo "-----> Bundling PHP version $PHP_VERSION"
-curl --silent --max-time 60 --location "$PHP_URL" | tar xz
-
-
+    installMcrypt
+    installApache
+    installPhp
+    
     updateConfig
     linkBinaries
 
