@@ -247,7 +247,6 @@ function runComposer(){
     if [ -f www/composer.json ] && [ ! -d www/vendor ]; then
         echo "       -----> Composer dependencies found"
         COMPOSER_URL="http://getcomposer.org/composer.phar"
-        sComposerOptions=' --prefer-source --optimize-autoloader --no-interaction --no-dev'
         GIT_DIR_ORIG=$GIT_DIR
         unset GIT_DIR
 
@@ -258,7 +257,8 @@ function runComposer(){
         echo "       -----> Running Composer "
         # @NOTE: We need to point LD_LIBRARY_PATH to where the mcrypt.so is so PHP can find it
         #        Otherwise is will crash stating "error while loading shared libraries: libmcrypt.so.4: cannot open shared object file: No such file or directory"
-        LD_LIBRARY_PATH=$BUILD_DIR/vendor/mcrypt/lib ${BUILD_DIR}/php/bin/php -c $LP_DIR/conf/php.ini composer.phar install "${sComposerOptions}"
+        LD_LIBRARY_PATH=$BUILD_DIR/vendor/mcrypt/lib ${BUILD_DIR}/php/bin/php -c $LP_DIR/conf/php.ini \
+            composer.phar install  --verbose --prefer-source --optimize-autoloader --no-interaction --no-dev
 
         echo "       -----> Cleaning up after Composer"
         rm -rf vendor/**/.git
