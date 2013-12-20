@@ -180,7 +180,6 @@ function runComposer(){
       echo "       -----> Composer dependencies found"
       COMPOSER_URL="http://getcomposer.org/composer.phar"
       GIT_DIR_ORIG=$GIT_DIR
-      LD_LIBRARY_PATH=$BUILD_DIR/php/ext
       unset GIT_DIR
 
       echo "       -----> Fetching Composer"
@@ -188,7 +187,7 @@ function runComposer(){
       cd www
 
       echo "       -----> Running Composer"
-      $BUILD_DIR/php/bin/php -c $LP_DIR/conf/php.ini composer.phar install --prefer-source
+      LD_LIBRARY_PATH=$BUILD_DIR/php/ext $BUILD_DIR/php/bin/php -c $LP_DIR/conf/php.ini composer.phar install --prefer-source
 
       echo "       -----> Cleaning up after Composer"
       rm -rf vendor/**/.git
