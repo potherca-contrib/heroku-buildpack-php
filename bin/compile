@@ -49,19 +49,22 @@ declare -a aKeep
 #aKeep+=('last_pack_release.out')
 # ==============================================================================
 
+sTarbalUrl='https://heroku-buildpack-php.s3.amazonaws.com'
+heroku_rev='2'
+
 # ==============================================================================
 # ------------------------------------------------------------------------------
-APACHE_VERSION="2.2.22"
+APACHE_VERSION="2.2.25"
 APACHE_PATH="apache"
-APACHE_URL="https://s3.amazonaws.com/php-lp/apache-$APACHE_VERSION.tar.gz"
+APACHE_URL="${sTarbalUrl}/apache-${APACHE_VERSION}-${heroku_rev}.tar.gz"
 # ==============================================================================
 
 
 # ==============================================================================
 # ------------------------------------------------------------------------------
 PHP_VERSION="5.3.27"
-PHP_PATH="php"
-PHP_URL="https://s3.amazonaws.com/php-lp/php-$PHP_VERSION.tar.gz"
+PHP_PATH="php" # @CHECKME: Unused variable. Why?
+PHP_URL="${sTarbalUrl}/php-${PHP_VERSION}-${heroku_rev}.tar.gz"
 # ==============================================================================
 
 
