@@ -245,29 +245,31 @@ function linkBinaries(){
 function runComposer(){
     echo "-----> Checking for Composer dependencies"
     if [ -f www/composer.json ] && [ ! -d www/vendor ]; then
-      echo "       -----> Composer dependencies found"
-      COMPOSER_URL="http://getcomposer.org/composer.phar"
-      GIT_DIR_ORIG=$GIT_DIR
-      unset GIT_DIR
+        echo "       -----> Composer dependencies found"
+        COMPOSER_URL="http://getcomposer.org/composer.phar"
+        GIT_DIR_ORIG=$GIT_DIR
+        unset GIT_DIR
 
-      echo "       -----> Fetching Composer"
-      curl --silent --max-time 60 --location "$COMPOSER_URL" > www/composer.phar
-      cd www
+        echo "       -----> Fetching Composer"
+        curl --silent --max-time 60 --location "$COMPOSER_URL" > www/composer.phar
+        cd www
 
-      echo "       -----> Running Composer "
+        echo "       -----> Running Composer "
 
 
-#export PATH="${PATH}:${BUILD_DIR}/vendor/php/bin"
-#export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:${BUILD_DIR}/local/lib
+        #export PATH="${PATH}:${BUILD_DIR}/vendor/php/bin"
 
-      #LD_LIBRARY_PATH=$BUILD_DIR/php $BUILD_DIR/php/bin/php -c $LP_DIR/conf/php.ini composer.phar install --prefer-source
-      LD_LIBRARY_PATH=$BUILD_DIR/vendor/mcrypt/lib $BUILD_DIR/php/bin/php -c $LP_DIR/conf/php.ini composer.phar install --prefer-source
+        export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:${BUILD_DIR}/local/lib"
 
-      echo "       -----> Cleaning up after Composer"
-      rm -rf vendor/**/.git
-      cd $BUILD_DIR
-      rm www/composer.phar
-      export GIT_DIR=$GIT_DIR_ORIG
+        #LD_LIBRARY_PATH=$BUILD_DIR/php $BUILD_DIR/php/bin/php -c $LP_DIR/conf/php.ini composer.phar install --prefer-source
+        #LD_LIBRARY_PATH=$BUILD_DIR/vendor/mcrypt/lib
+        ${BUILD_DIR}/php/bin/php -c $LP_DIR/conf/php.ini composer.phar install --prefer-source
+
+        echo "       -----> Cleaning up after Composer"
+        rm -rf vendor/**/.git
+        cd $BUILD_DIR
+        rm www/composer.phar
+        export GIT_DIR=$GIT_DIR_ORIG
     fi
 }
 # ==============================================================================
