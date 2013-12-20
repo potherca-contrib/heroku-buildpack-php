@@ -104,19 +104,26 @@ function keep() {
 # move app things to www
 # ------------------------------------------------------------------------------
 function moveAppToWebRoot(){
-      echo "-----> Moving Project Files"
+    echo "-----> Moving Project Files"
     mkdir -p $CACHE_DIR/www
 
+    #if [ -d "www/" ]; then
+    #    echo "     -----> Moving `pwd`/www/* to `pwd`"
+    #    #mv -v --target-directory="." "www/*"
+    #    mv -v "./www/*" "./*"
+    #else
+    #    echo "     ERROR> Could not find a 'www' directory in `pwd`"
+    #fi
 
     for sItem in $( ls ); do
-        in_array "${sItem}" "${aKeep[@]}" || mv "${sItem}" "${CACHE_DIR}/www"
+        in_array "${sItem}" "${aKeep[@]}" || mv -v "${sItem}" "${CACHE_DIR}/www"
     done
 
-    mv $CACHE_DIR/www .
+    mv -v $CACHE_DIR/www .
 
     # keep Procfile
     if [ -f www/Procfile ]; then
-      mv www/Procfile .
+      mv -v www/Procfile .
     fi
 }
 # ==============================================================================
@@ -171,14 +178,18 @@ function runComposer(){
       echo "-----> Checking for Composer dependencies"
     if [ -f www/composer.json ] && [ ! -d www/vendor ]; then
       echo "       -----> Composer dependencies found"
-      GIT_DIR_ORIG=$GIT_DIR
-      unset GIT_DIR
       COMPOSER_URL="http://getcomposer.org/composer.phar"
+      GIT_DIR_ORIG=$GIT_DIR
+      LD_LIBRARY_PATH=$BUILD_DIR/php/ext
+      unset GIT_DIR
+
       echo "       -----> Fetching Composer"
       curl --silent --max-time 60 --location "$COMPOSER_URL" > www/composer.phar
       cd www
+
       echo "       -----> Running Composer"
-      LD_LIBRARY_PATH=$BUILD_DIR/php/ext $BUILD_DIR/php/bin/php -c $LP_DIR/conf/php.ini composer.phar install --prefer-source
+      $BUILD_DIR/php/bin/php -c $LP_DIR/conf/php.ini composer.phar install --prefer-source
+
       echo "       -----> Cleaning up after Composer"
       rm -rf vendor/**/.git
       cd $BUILD_DIR
