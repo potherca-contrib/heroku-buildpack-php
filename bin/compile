@@ -90,23 +90,41 @@ function preRun(){
 # ==============================================================================
 
 
+function keep() {
+    echo "----->     Attempt to move ${1}"
+    if [ -f "www/${1}" ]; then
+        mv -v --target-directory="${HOME}/" "www/${1}"
+    elif [ -d "www/${1}" ]; then
+        mv -v --target-directory="${HOME}/" "www/${1}"
+    else
+        echo "----->          !     FAILED TO MOVE ${1} to ${HOME}"
+    fi
+}
 # ==============================================================================
 # move app things to www
 # ------------------------------------------------------------------------------
 function moveAppToWebRoot(){
-      echo "-----> Moving Project Files"
-    mkdir -p $CACHE_DIR/www
+    echo "-----> Moving Project Files"
+    mkdir -p "${CACHE_DIR}/www"
 
-    for sItem in $( ls ); do
-        in_array "${sItem}" "${aKeep[@]}" || mv "${sItem}" "${CACHE_DIR}/www"
-    done
+    if [ -d "www/" ]; then
+        echo "     -----> Moving `pwd`/www/* to `pwd`"
+        #mv -v --target-directory="." "www/*"
+        mv -v "./www/*" "./*"
+    else
+        echo "     ERROR> Could not find a 'www' directory in `pwd`"
+    fi
 
-    mv $CACHE_DIR/www .
+    #for sItem in $( ls ); do
+    #    in_array "${sItem}" "${aKeep[@]}" || mv "${sItem}" "${CACHE_DIR}/www"
+    #done
+
+    #mv $CACHE_DIR/www .
 
     # keep Procfile
-    if [ -f www/Procfile ]; then
-      mv www/Procfile .
-    fi
+    #if [ -f www/Procfile ]; then
+    #  mv www/Procfile .
+    #fi
 }
 # ==============================================================================
 
@@ -163,11 +181,15 @@ function runComposer(){
       GIT_DIR_ORIG=$GIT_DIR
       unset GIT_DIR
       COMPOSER_URL="http://getcomposer.org/composer.phar"
+
       echo "       -----> Fetching Composer"
       curl --silent --max-time 60 --location "$COMPOSER_URL" > www/composer.phar
       cd www
+
       echo "       -----> Running Composer"
-      LD_LIBRARY_PATH=$BUILD_DIR/php/ext $BUILD_DIR/php/bin/php -c $LP_DIR/conf/php.ini composer.phar install --prefer-source
+      LD_LIBRARY_PATH=$BUILD_DIR/php/ext
+      $BUILD_DIR/php/bin/php -c $LP_DIR/conf/php.ini composer.phar install --prefer-source
+
       echo "       -----> Cleaning up after Composer"
       rm -rf vendor/**/.git
       cd $BUILD_DIR
@@ -242,6 +264,7 @@ echo "BUILD_DIR = ${BUILD_DIR}"
 echo "CACHE_DIR = ${CACHE_DIR}"
 echo "LP_DIR    = ${LP_DIR}"
 echo "HOME      = ${HOME}"
+echo "GIT_DIT   = ${GIT_DIR}"
 echo "pwd       = `pwd`"
 echo '# ------------------------------------------------------------------------------'
 
