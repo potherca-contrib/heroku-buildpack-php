@@ -277,18 +277,6 @@ function createBootScript(){
     cat >> boot.sh <<EOF
     echo "=====> Running Boot Script"
 
-    for var in \`env|cut -f1 -d=\`; do
-      echo "PassEnv \$var" >> /app/apache/conf/httpd.conf;
-    done
-    touch /app/apache/logs/error_log
-    touch /app/apache/logs/access_log
-    tail -F /app/apache/logs/error_log &
-    tail -F /app/apache/logs/access_log &
-    export LD_LIBRARY_PATH=/app/php
-    export PHP_INI_SCAN_DIR=/app/www
-    echo "Launching Apache"
-    exec /app/apache/bin/httpd -DNO_DETACH
-
     echo "-----> Checking for Composer dependencies"
     if [ -f /app/www/composer.json ] && [ ! -d /app/www/vendor ]; then
       echo "       -----> Composer dependencies found"
@@ -311,6 +299,19 @@ function createBootScript(){
       rm /app/www/composer.phar
       export GIT_DIR=$GIT_DIR_ORIG
     fi
+    
+    for var in \`env|cut -f1 -d=\`; do
+      echo "PassEnv \$var" >> /app/apache/conf/httpd.conf;
+    done
+    touch /app/apache/logs/error_log
+    touch /app/apache/logs/access_log
+    tail -F /app/apache/logs/error_log &
+    tail -F /app/apache/logs/access_log &
+    export LD_LIBRARY_PATH=/app/php
+    export PHP_INI_SCAN_DIR=/app/www
+    echo "Launching Apache"
+    exec /app/apache/bin/httpd -DNO_DETACH
+
 EOF
 
     chmod +x boot.sh
