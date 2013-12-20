@@ -255,7 +255,8 @@ function runComposer(){
       cd www
 
       echo "       -----> Running Composer"
-      LD_LIBRARY_PATH=$BUILD_DIR/php $BUILD_DIR/php/bin/php -c $LP_DIR/conf/php.ini composer.phar install --prefer-source
+      #LD_LIBRARY_PATH=$BUILD_DIR/php
+      $BUILD_DIR/php/bin/php -c $LP_DIR/conf/php.ini composer.phar install --prefer-source
 
       echo "       -----> Cleaning up after Composer"
       rm -rf vendor/**/.git
