@@ -279,27 +279,27 @@ function createBootScript(){
 
     echo "-----> Checking for Composer dependencies"
     if [ -f /app/www/composer.json ] && [ ! -d /app/www/vendor ]; then
-      echo "       -----> Composer dependencies found"
-      COMPOSER_URL="http://getcomposer.org/composer.phar"
-      GIT_DIR_ORIG=$GIT_DIR
-      unset GIT_DIR
+        echo "       -----> Composer dependencies found"
+        COMPOSER_URL="http://getcomposer.org/composer.phar"
+        GIT_DIR_ORIG=$GIT_DIR
+        unset GIT_DIR
 
-      echo "       -----> Fetching Composer"
-      curl --silent --max-time 60 --location "$COMPOSER_URL" > /app/www/composer.phar
-      cd /app/www
+        echo "       -----> Fetching Composer"
+        curl --silent --max-time 60 --location "$COMPOSER_URL" > /app/www/composer.phar
+        cd /app/www
 
-      echo "       -----> Running Composer"
-      #LD_LIBRARY_PATH=$BUILD_DIR/php
-      #$BUILD_DIR/php/bin/php -c $LP_DIR/conf/php.ini
-      php composer.phar install --prefer-source
+        echo "       -----> Running Composer"
+        #LD_LIBRARY_PATH=$BUILD_DIR/php
+        #$BUILD_DIR/php/bin/php -c $LP_DIR/conf/php.ini
+        /app/bin/php composer.phar install --prefer-source
 
-      echo "       -----> Cleaning up after Composer"
-      rm -rf vendor/**/.git
-      cd $BUILD_DIR
-      rm /app/www/composer.phar
-      export GIT_DIR=$GIT_DIR_ORIG
+        echo "       -----> Cleaning up after Composer"
+        rm -rf vendor/**/.git
+        cd $BUILD_DIR
+        rm /app/www/composer.phar
+        export GIT_DIR=$GIT_DIR_ORIG
     fi
-    
+
     for var in \`env|cut -f1 -d=\`; do
       echo "PassEnv \$var" >> /app/apache/conf/httpd.conf;
     done
