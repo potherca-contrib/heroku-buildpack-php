@@ -286,8 +286,10 @@ function createBootScript(){
         curl --silent --max-time 60 --location "$COMPOSER_URL" > /app/www/composer.phar
 
         echo "       -----> Running Composer"
+        pwd
         cd /app/www
-        /app/bin/php composer.phar install --prefer-source
+        pwd
+        /app/bin/php composer.phar install -v --prefer-source
         ls -lR
 
         echo "       -----> Cleaning up after Composer"
