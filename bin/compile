@@ -2,9 +2,30 @@
 # bin/compile <build-dir> <cache-dir>
 
 ################################################################################
-# Potherca Custom Heroku Boot script
+# Potherca Custom Heroku Compile script for PHP apps with Composer Dependencies
 # ------------------------------------------------------------------------------
 # Sometimes the standards are just not what you need, so I am hacking my own.
+#
+# The default (and most custom) PHP buildpacks place the entire application in
+# the web root directory of the application.
+#
+# I don't like that, since I tend to have my applications setup more neatly, so
+# this buildpack will keep the entire application in the project root and only
+# move public content to the web root.
+#
+# Some notes on Heroku Buildpacks:
+#
+# BUILD_DIR will be the location of the app and CACHE_DIR will be a location the
+# buildpack can use to cache build artifacts between builds. As the contents of
+# CACHE_DIR will be persisted between builds, you can cache the results of long
+# processes like dependency resolution here to speed up future builds.
+#
+# The application in BUILD_DIR along with all changes made by the compile script
+# will be packaged into a slug
+#
+# All output received on STDOUT from this script will be displayed to the user.
+#
+# For full details see https://devcenter.heroku.com/articles/buildpack-api
 ################################################################################
 
 
@@ -38,7 +59,7 @@ APACHE_URL="https://s3.amazonaws.com/php-lp/apache-$APACHE_VERSION.tar.gz"
 
 # ==============================================================================
 # ------------------------------------------------------------------------------
-PHP_VERSION="5.3.10"
+PHP_VERSION="5.3.27"
 PHP_PATH="php"
 PHP_URL="https://s3.amazonaws.com/php-lp/php-$PHP_VERSION.tar.gz"
 # ==============================================================================
@@ -74,12 +95,26 @@ in_array(){
 }
 # ==============================================================================
 
+# ==============================================================================
+# Output some system information
+# ------------------------------------------------------------------------------
+function echoInfo(){
+echo '# =============================================================================='
+echo "BIN_DIR   = ${BIN_DIR}"
+echo "BUILD_DIR = ${BUILD_DIR}"
+echo "CACHE_DIR = ${CACHE_DIR}"
+echo "LP_DIR    = ${LP_DIR}"
+echo "HOME      = ${HOME}"
+echo "pwd       = `pwd`"
+echo '# ------------------------------------------------------------------------------'
+# ==============================================================================
 
 
 # ==============================================================================
 # Prepare for action
 # ------------------------------------------------------------------------------
 function preRun(){
+    #echoInfo
 	echo '=====> Preparing...'
     # include .files when moving things around
     shopt -s dotglob
@@ -206,7 +241,7 @@ function createBootScript(){
     echo "-----> Creating boot script"
     # @FIXME: We should check the project files for post-install/boot commands and add those too!
     cat >> boot.sh <<EOF
-    echo "=====> Running Script ${0}"
+    echo "=====> Running Boot Script"
 
     for var in \`env|cut -f1 -d=\`; do
       echo "PassEnv \$var" >> /app/apache/conf/httpd.conf;
@@ -257,14 +292,6 @@ function run (){
 # ==============================================================================
 
 echo "=====> Running Script ${0}"
-echo '# =============================================================================='
-echo "BIN_DIR   = ${BIN_DIR}"
-echo "BUILD_DIR = ${BUILD_DIR}"
-echo "CACHE_DIR = ${CACHE_DIR}"
-echo "LP_DIR    = ${LP_DIR}"
-echo "HOME      = ${HOME}"
-echo "pwd       = `pwd`"
-echo '# ------------------------------------------------------------------------------'
 
 preRun
 run
