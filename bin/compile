@@ -162,10 +162,10 @@ function moveAppToWebRoot(){
     #fi
 
     for sItem in $( ls ); do
-        in_array "${sItem}" "${aKeep[@]}" || mv -v "${sItem}" "${CACHE_DIR}/www"
+        in_array "${sItem}" "${aKeep[@]}" || mv "${sItem}" "${CACHE_DIR}/www"
     done
 
-    mv -v $CACHE_DIR/www .
+    mv $CACHE_DIR/www .
 
     # keep Procfile
     if [ -f www/Procfile ]; then
@@ -179,8 +179,7 @@ function moveAppToWebRoot(){
 # Install Apache
 # ------------------------------------------------------------------------------
 function installApache(){
-    echo "-----> Bundling Apache version ${APACHE_VERSION}"
-    curl --silent --max-time 60 --location "${APACHE_URL}" | tar xz
+    install 'Apache' "${APACHE_VERSION}" "${APACHE_URL}"
 }
 # ==============================================================================
 
@@ -189,8 +188,7 @@ function installApache(){
 # Install PHP
 # ------------------------------------------------------------------------------
 function installPhp(){
-    echo "-----> Bundling PHP version ${PHP_VERSION}"
-    curl --silent --max-time 60 --location "${PHP_URL}" | tar xz
+    install 'PHP' "${PHP_VERSION}" "${PHP_URL}"
 }
 # ==============================================================================
 
@@ -199,8 +197,7 @@ function installPhp(){
 # Install PHP
 # ------------------------------------------------------------------------------
 function installMcrypt(){
-    echo "-----> Bundling mcrypt version ${MCRYPT_VERSION}"
-    curl --silent --max-time 60 --location "$MCRYPT_URL" | tar xz
+    install 'mcrypt' "${MCRYPT_VERSION}" "$MCRYPT_URL"
 }
 # ==============================================================================
 
@@ -280,7 +277,7 @@ function createBootScript(){
     touch /app/apache/logs/access_log
     tail -F /app/apache/logs/error_log &
     tail -F /app/apache/logs/access_log &
-    export LD_LIBRARY_PATH=/app/php/ext
+    export LD_LIBRARY_PATH=/app/php
     export PHP_INI_SCAN_DIR=/app/www
     echo "Launching apache"
     exec /app/apache/bin/httpd -DNO_DETACH
@@ -309,9 +306,9 @@ function run (){
     echo "=====> Running Install"
     moveAppToWebRoot
 
-    installMcrypt
-    installApache
-    installPhp
+    #installMcrypt
+    #installApache
+    #installPhp
     
     updateConfig
     linkBinaries
@@ -327,5 +324,24 @@ echo "=====> Running Script ${0}"
 preRun
 run
 postRun
+
+# Heroku Revision.
+#
+# Affixed to all vendored binary output to represent changes to the
+# compilation environment without a change to the upstream version,
+# e.g. PHP 5.3.27 without, and then subsequently with, libmcrypt.
+heroku_rev='-2'
+
+MCRYPT_URL="https://heroku-buildpack-php.s3.amazonaws.com/mcrypt-""$MCRYPT_VERSION""$heroku_rev"".tar.gz"
+echo "-----> Bundling mcrypt version $MCRYPT_VERSION"
+curl --silent --max-time 60 --location "$MCRYPT_URL" | tar xz
+
+APACHE_URL="https://heroku-buildpack-php.s3.amazonaws.com/apache-""$APACHE_VERSION""$heroku_rev"".tar.gz"
+echo "-----> Bundling Apache version $APACHE_VERSION"
+curl --silent --max-time 60 --location "$APACHE_URL" | tar xz
+
+PHP_URL="https://heroku-buildpack-php.s3.amazonaws.com/php-$PHP_VERSION""$heroku_rev"".tar.gz"
+echo "-----> Bundling PHP version $PHP_VERSION"
+curl --silent --max-time 60 --location "$PHP_URL" | tar xz
 
 #EOF
