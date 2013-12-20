@@ -105,7 +105,7 @@ function keep() {
 # ------------------------------------------------------------------------------
 function moveAppToWebRoot(){
     echo "-----> Moving Project Files"
-    #mkdir -p "${CACHE_DIR}/www"
+    mkdir -p "${CACHE_DIR}/www"
 
     #if [ -d "www/" ]; then
     #    echo "     -----> Moving `pwd`/www/* to `pwd`"
@@ -119,12 +119,12 @@ function moveAppToWebRoot(){
     #    in_array "${sItem}" "${aKeep[@]}" || mv "${sItem}" "${CACHE_DIR}/www"
     #done
 
-    #mv $CACHE_DIR/www .
+    mv $CACHE_DIR/www .
 
     # keep Procfile
-    #if [ -f www/Procfile ]; then
-    #  mv www/Procfile .
-    #fi
+    if [ -f www/Procfile ]; then
+      mv www/Procfile .
+    fi
 }
 # ==============================================================================
 
