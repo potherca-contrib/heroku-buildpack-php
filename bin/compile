@@ -254,9 +254,13 @@ function runComposer(){
       curl --silent --max-time 60 --location "$COMPOSER_URL" > www/composer.phar
       cd www
 
-      echo "       -----> Running Composer"
-      #LD_LIBRARY_PATH=$BUILD_DIR/php
-      $BUILD_DIR/php/bin/php -c $LP_DIR/conf/php.ini composer.phar install --prefer-source
+      echo "       -----> Running Composer "
+
+      echo "LD_LIBRARY_PATH = ${LD_LIBRARY_PATH}"
+      echo "BUILD_DIR       = ${BUILD_DIR}"
+      echo "`ls -lR ${BUILD_DIR}`"
+
+      #LD_LIBRARY_PATH=$BUILD_DIR/php $BUILD_DIR/php/bin/php -c $LP_DIR/conf/php.ini composer.phar install --prefer-source
 
       echo "       -----> Cleaning up after Composer"
       rm -rf vendor/**/.git
@@ -317,11 +321,11 @@ function run (){
     installMcrypt
     installApache
     installPhp
-    
+
     updateConfig
     linkBinaries
 
-    #runComposer
+    runComposer
 
     createBootScript
 }
