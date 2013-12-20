@@ -8,12 +8,8 @@
 ################################################################################
 
 
-
-################################################################################
-# CONFIG
-################################################################################
-
 # ==============================================================================
+# CONFIG
 # ------------------------------------------------------------------------------
 # fail fast
 set -e
@@ -24,11 +20,12 @@ set -e
 # ==============================================================================
 # The files in the project root we don't want moved to the root
 # ------------------------------------------------------------------------------
+# @FIXME: Any files that need to remain in /app/www that are not in /app/www/web need to be read from a file in the project
 declare -a aKeep
-aKeep+=('.buildpacks')
-aKeep+=('.profile.d')
-aKeep+=('vendor')
-aKeep+=('last_pack_release.out')
+#aKeep+=('.buildpacks')
+#aKeep+=('.profile.d')
+#aKeep+=('vendor')
+#aKeep+=('last_pack_release.out')
 # ==============================================================================
 
 # ==============================================================================
@@ -54,8 +51,6 @@ BUILD_DIR=$1
 CACHE_DIR=$2
 LP_DIR=`cd $(dirname $0); cd ..; pwd`
 # ==============================================================================
-
-
 
 ################################################################################
 # FUNCTIONS
@@ -99,6 +94,7 @@ function preRun(){
 # move app things to www
 # ------------------------------------------------------------------------------
 function moveAppToWebRoot(){
+      echo "-----> Moving Project Files"
     mkdir -p $CACHE_DIR/www
 
     for sItem in $( ls ); do
@@ -139,6 +135,7 @@ function installPhp(){
 # update config files
 # ------------------------------------------------------------------------------
 function updateConfig(){
+    echo "-----> Updating config filus"
     cp $LP_DIR/conf/httpd.conf $APACHE_PATH/conf
     cp $LP_DIR/conf/php.ini php
 }
@@ -149,6 +146,7 @@ function updateConfig(){
 # make php available on bin
 # ------------------------------------------------------------------------------
 function linkBinaries(){
+    echo "-----> Linking binaries"
     mkdir -p bin
     ln -s /app/php/bin/php bin/php
 }
@@ -159,14 +157,18 @@ function linkBinaries(){
 # check if we have Composer dependencies and vendors are not bundled
 # ------------------------------------------------------------------------------
 function runComposer(){
+      echo "-----> Checking for Composer dependencies"
     if [ -f www/composer.json ] && [ ! -d www/vendor ]; then
+      echo "       -----> Composer dependencies found"
       GIT_DIR_ORIG=$GIT_DIR
       unset GIT_DIR
-      echo "-----> Installing Composer dependencies"
       COMPOSER_URL="http://getcomposer.org/composer.phar"
+      echo "       -----> Fetching Composer"
       curl --silent --max-time 60 --location "$COMPOSER_URL" > www/composer.phar
       cd www
+      echo "       -----> Running Composer"
       LD_LIBRARY_PATH=$BUILD_DIR/php/ext $BUILD_DIR/php/bin/php -c $LP_DIR/conf/php.ini composer.phar install --prefer-source
+      echo "       -----> Cleaning up after Composer"
       rm -rf vendor/**/.git
       cd $BUILD_DIR
       rm www/composer.phar
@@ -180,6 +182,8 @@ function runComposer(){
 # Setup boot file that runs our web worker
 # ------------------------------------------------------------------------------
 function createBootScript(){
+    echo "-----> Creating boot script"
+    # @FIXME: We should check the project files for post-install/boot commands and add those too!
     cat >> boot.sh <<EOF
     for var in \`env|cut -f1 -d=\`; do
       echo "PassEnv \$var" >> /app/apache/conf/httpd.conf;
@@ -214,6 +218,7 @@ function postRun(){
 # On your places... Set... Go!
 # ------------------------------------------------------------------------------
 function run (){
+    echo "=====> Running Install"
     moveAppToWebRoot
 
     installApache
@@ -229,6 +234,15 @@ function run (){
 # ==============================================================================
 
 echo "=====> Running Script ${0}"
+echo '# =============================================================================='
+echo "BIN_DIR   = ${BIN_DIR}"
+echo "BUILD_DIR = ${BUILD_DIR}"
+echo "CACHE_DIR = ${CACHE_DIR}"
+echo "LP_DIR    = ${LP_DIR}"
+echo "HOME      = ${HOME}"
+echo "pwd       = `pwd`"
+echo '# ------------------------------------------------------------------------------'
+
 preRun
 run
 postRun
