@@ -245,13 +245,12 @@ function findDocumentRoot(){
 # ------------------------------------------------------------------------------
 function updateConfig(){
 
-    echo "-----> Updating config files"
+    echo "-----> Copying config files"
     cp "${LP_DIR}/conf/httpd.conf" "${APACHE_PATH}/conf"
-    cp "${LP_DIR}/conf/DocumentRoot.conf" "${APACHE_PATH}/conf"
     cp "${LP_DIR}/conf/php.ini" "${PHP_PATH}"
 
-    echo "-----> Updating DocumentRoot in Config File"
-    echo "DocumentRoot \"${g_sDocumentRoot}\"" > "${APACHE_PATH}/conf/DocumentRoot.conf"
+    echo "       Updating DocumentRoot in Config File"
+    sed -i "s#/app/www#${g_sDocumentRoot}#g" "${APACHE_PATH}/conf/httpd.conf"
 }
 # ==============================================================================
 
@@ -273,28 +272,28 @@ function linkBinaries(){
 function runComposer(){
     echo "-----> Checking for Composer dependencies"
     if [ -f www/composer.json ] && [ ! -d www/vendor ]; then
-        echo "       -----> Composer dependencies found"
+        echo "              Composer dependencies found"
         COMPOSER_URL="http://getcomposer.org/composer.phar"
         GIT_DIR_ORIG=$GIT_DIR
         unset GIT_DIR
 
-        echo "       -----> Fetching Composer"
+        echo "              Fetching Composer"
         curl --silent --max-time 60 --location "$COMPOSER_URL" > www/composer.phar
         cd www
 
-        echo "       -----> Running Composer "
+        echo "              Running Composer "
         # @NOTE: We need to point LD_LIBRARY_PATH to where the mcrypt.so is so PHP can find it
         #        Otherwise is will crash stating "error while loading shared libraries: libmcrypt.so.4: cannot open shared object file: No such file or directory"
         LD_LIBRARY_PATH=$BUILD_DIR/vendor/mcrypt/lib ${BUILD_DIR}/php/bin/php -c $LP_DIR/conf/php.ini \
             composer.phar install  --verbose --prefer-source --optimize-autoloader --no-interaction --no-dev
 
-        echo "       -----> Cleaning up after Composer"
+        echo "              Cleaning up after Composer"
         rm -rf vendor/**/.git
         cd $BUILD_DIR
         rm www/composer.phar
         export GIT_DIR=$GIT_DIR_ORIG
     else
-        echo "       -----> No Composer dependencies found"
+        echo "              No Composer dependencies found"
     fi
 }
 # ==============================================================================
