@@ -67,3 +67,6 @@ Meta
 
 Created by Pedro Belo.
 Many thanks to Keith Rarick for the help with assorted Unix topics :)
+
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/potherca/heroku-buildpack-php/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+
