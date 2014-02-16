@@ -21,16 +21,21 @@
 # CACHE_DIR will be persisted between builds, you can cache the results of long
 # processes like dependency resolution here to speed up future builds.
 #
-# As there might be more buildpacks that use this space, please take care not to
-# (re)move any files that do not belong to the currently run buildpack as this
-# can mess with files other buildpacks have stored in the cache directory.
-#
 # The application in BUILD_DIR along with all changes made by the compile script
 # will be packaged into a slug and deployed.
 #
 # All output received on STDOUT from this script will be displayed to the user.
 #
 # For full details see https://devcenter.heroku.com/articles/buildpack-api
+#
+# Some notes on using Multiple Buildpacks
+#
+# As some projects may want to use several buildpacks, care needs to be not to
+# (re)move any files that do not belong to the currently run buildpack as this
+# can mess with files other buildpacks have stored in the cache directory.
+#
+# The same goes for system and environment variables (like HOME, PATH,
+# LD_LIBRARY_PATH, etc)
 ################################################################################
 
 
@@ -315,12 +320,14 @@ function createBootScript(){
     for var in \`env|cut -f1 -d=\`; do
       echo "PassEnv \$var" >> /app/apache/conf/httpd.conf;
     done
+
     touch /app/apache/logs/error_log
     touch /app/apache/logs/access_log
     tail -F /app/apache/logs/error_log &
     tail -F /app/apache/logs/access_log &
-    export LD_LIBRARY_PATH=/app/php
-    export PHP_INI_SCAN_DIR=/app/www
+
+    #export LD_LIBRARY_PATH="/app/php" # Should be set through `heroku config`
+    export PHP_INI_SCAN_DIR="/app/www"
     echo "Launching Apache"
     exec /app/apache/bin/httpd -DNO_DETACH
 EOF
