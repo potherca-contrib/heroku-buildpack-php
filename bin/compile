@@ -251,7 +251,7 @@ function updateConfig(){
     cp "${LP_DIR}/conf/php.ini" "${PHP_PATH}"
 
     echo "-----> Updating DocumentRoot in Config File"
-    echo "DocumentRoot \"${sDocumentRoot}\"" > "${APACHE_PATH}/conf/DocumentRoot.conf"
+    echo "DocumentRoot \"${g_sDocumentRoot}\"" > "${APACHE_PATH}/conf/DocumentRoot.conf"
 }
 # ==============================================================================
 
