@@ -35,7 +35,8 @@
 # can mess with files other buildpacks have stored in the cache directory.
 #
 # The same goes for system and environment variables (like HOME, PATH,
-# LD_LIBRARY_PATH, etc)
+# LD_LIBRARY_PATH, etc), so any variables you may need should be set either
+# through your projects `boot.sh` or using `heroku config:add`
 ################################################################################
 
 
@@ -326,7 +327,6 @@ function createBootScript(){
     tail -F /app/apache/logs/error_log &
     tail -F /app/apache/logs/access_log &
 
-    #export LD_LIBRARY_PATH="/app/php" # Should be set through `heroku config`
     export PHP_INI_SCAN_DIR="/app/www"
     echo "Launching Apache"
     exec /app/apache/bin/httpd -DNO_DETACH
