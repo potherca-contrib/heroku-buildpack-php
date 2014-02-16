@@ -151,7 +151,7 @@ function echoInfo(){
 # ------------------------------------------------------------------------------
 function preRun(){
     echo '=====> Preparing...'
-    #echoInfo
+    echoInfo
     # include .files when moving things around
     shopt -s dotglob
 

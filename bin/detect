@@ -30,6 +30,22 @@ aPossibleDocumentRoots+=('public')
 ################################################################################
 # FUNCTIONS
 ################################################################################
+# ==============================================================================
+# Output some system information
+# ------------------------------------------------------------------------------
+function echoInfo(){
+    echo '# =============================================================================='
+    #echo "BIN_DIR   = ${BIN_DIR}"
+    echo "BUILD_DIR = ${BUILD_DIR}"
+    #echo "CACHE_DIR = ${CACHE_DIR}"
+    #echo "LP_DIR    = ${LP_DIR}"
+    echo "HOME      = ${HOME}"
+    echo "pwd       = `pwd`"
+    echo "\$2       = ${2}"
+    echo '# ------------------------------------------------------------------------------'
+}
+# ==============================================================================
+
 
 # ==============================================================================
 # Tries to find out if there is a public web dir
@@ -38,6 +54,7 @@ function detectDocumentRoot(){
     bFound=false
 
     for sDirectory in ${aPossibleDocumentRoots}; do
+        echo "Checking for existance of '${BUILD_DIR}/${sDirectory}'"
         if [ -d "${BUILD_DIR}/${sDirectory}" ]; then
             bFound=true
             break
@@ -45,14 +62,17 @@ function detectDocumentRoot(){
     done
 
     if [ ${bFound} == true ]; then
-      echo "Potherca-PHP"
+      echo "Potherca-PHP-true"
       exit 0
     else
-      exit 1
+      echo "Potherca-PHP-false"
+      exit 0
+#      exit 1
     fi
 }
 # ==============================================================================
 
+echoInfo
 detectDocumentRoot
 
 #EOF
