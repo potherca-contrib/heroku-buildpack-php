@@ -42,7 +42,7 @@ function detectDocumentRoot(){
     done
 
     if [ ${bFound} == true ]; then
-        echo "Potherca:PHP-app"
+        echo "Potherca:PHP"
         exit 0
     else
         exit 1
