@@ -11,8 +11,8 @@
 #
 # I don't like that, since I tend to have my applications setup more neatly, so
 # this buildpack will keep the entire application AS IS and assumes you have the
-# decency to place your public files in a web root, either named `www` or `web`
-# or `html`.
+# decency to place your public files in a web root, either named `www`, `web`,
+# `html` or `public`.
 #
 # Some notes on Heroku Buildpacks:
 #
@@ -21,8 +21,12 @@
 # CACHE_DIR will be persisted between builds, you can cache the results of long
 # processes like dependency resolution here to speed up future builds.
 #
+# As there might be more buildpacks that use this space, please take care not to
+# (re)move any files that do not belong to the currently run buildpack as this
+# can mess with files other buildpacks have stored in the cache directory.
+#
 # The application in BUILD_DIR along with all changes made by the compile script
-# will be packaged into a slug
+# will be packaged into a slug and deployed.
 #
 # All output received on STDOUT from this script will be displayed to the user.
 #
@@ -180,8 +184,8 @@ function setDocumentRoot(){
 # move app things to www
 # ------------------------------------------------------------------------------
 function moveAppToWebRoot(){
-    echo "-----> Moving Project Files to Build Dir"
-    mv "${CACHE_DIR}" "${BUILD_DIR}"
+    echo "-----> Copying Project Files to Build Dir"
+    cp "${CACHE_DIR}" "${BUILD_DIR}"
 }
 # ==============================================================================
 
