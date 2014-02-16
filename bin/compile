@@ -41,7 +41,8 @@ set -e  # fail fast
 # ==============================================================================
 # Possible Directory Names for the DocumentRoot
 # ------------------------------------------------------------------------------
-aPossibleDocumentRoots=('www web html public')
+g_aPossibleDocumentRoots=('www web html public')
+g_sDocumentRoot=''
 # ==============================================================================
 
 
@@ -147,11 +148,30 @@ function echoInfo(){
 function preRun(){
     echo '=====> Preparing...'
     echoInfo
+
+    setDocumentRoot
+
     # include .files when moving things around
     shopt -s dotglob
 
     # go to the start
     cd $BUILD_DIR
+}
+# ==============================================================================
+
+
+# ==============================================================================
+# Prepare for action
+# ------------------------------------------------------------------------------
+function setDocumentRoot(){
+    findDocumentRoot
+
+    if ["${g_sDocumentRoot}" eq '']; then
+        echo "-----> Could not find DocumentRoot"
+        echo ""
+        echo "CAN NOT PROCEED WITHOUT DOCUMENTROOT. ABORTING."
+        exit 1
+    fi
 }
 # ==============================================================================
 
@@ -207,16 +227,15 @@ function install(){
 # Tries to find out the name of the public web dir
 # ------------------------------------------------------------------------------
 function findDocumentRoot(){
-    sDocumentRoot=''
+    echo "-----> Looking for DocumentRoot"
 
-    for sDirectory in ${aPossibleDocumentRoots}; do
+    for sDirectory in ${g_aPossibleDocumentRoots}; do
         if [ -d "${BUILD_DIR}/${sDirectory}" ]; then
-            sDocumentRoot=${sDirectory}
+            g_sDocumentRoot="/app/${sDirectory}/"
+            echo "-----> Found DocumentRoot '${g_sDocumentRoot}'"
             break
         fi
     done
-
-    echo "${sDocumentRoot}"
 }
 # ==============================================================================
 
@@ -231,23 +250,8 @@ function updateConfig(){
     cp "${LP_DIR}/conf/DocumentRoot.conf" "${APACHE_PATH}/conf"
     cp "${LP_DIR}/conf/php.ini" "${PHP_PATH}"
 
-    echo "-----> Looking for DocumentRoot"
-
-    for sDirectory in ${aPossibleDocumentRoots}; do
-        echo "Checking for existance of '${BUILD_DIR}/${sDirectory}'"
-        if [ -d "${BUILD_DIR}/${sDirectory}" ]; then
-            echo '----- exists'
-        fi
-    done
-
-    sDocumentRoot=$(findDocumentRoot)
-    if ["${sDocumentRoot}" eq '']; then
-        echo "-----> Could not find DocumentRoot"
-    else
-        sDocumentRoot="/app/${sDocumentRoot}/"
-        echo "-----> Updating DocumentRoot in Config File to '${sDocumentRoot}'"
-        echo "DocumentRoot \"${sDocumentRoot}\"" > "${APACHE_PATH}/conf/DocumentRoot.conf"
-    fi
+    echo "-----> Updating DocumentRoot in Config File"
+    echo "DocumentRoot \"${sDocumentRoot}\"" > "${APACHE_PATH}/conf/DocumentRoot.conf"
 }
 # ==============================================================================
 
