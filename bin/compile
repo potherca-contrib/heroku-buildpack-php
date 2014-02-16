@@ -41,12 +41,7 @@ set -e  # fail fast
 # ==============================================================================
 # Possible Directory Names for the DocumentRoot
 # ------------------------------------------------------------------------------
-declare -a aPossibleDocumentRoots
-
-aPossibleDocumentRoots+=('www')
-aPossibleDocumentRoots+=('web')
-aPossibleDocumentRoots+=('html')
-aPossibleDocumentRoots+=('public')
+aPossibleDocumentRoots=('www web html public')
 # ==============================================================================
 
 
@@ -215,7 +210,6 @@ function findDocumentRoot(){
     sDocumentRoot=''
 
     for sDirectory in ${aPossibleDocumentRoots}; do
-        echo "Checking for existance of '${BUILD_DIR}/${sDirectory}'"
         if [ -d "${BUILD_DIR}/${sDirectory}" ]; then
             sDocumentRoot=${sDirectory}
             break
@@ -238,6 +232,14 @@ function updateConfig(){
     cp "${LP_DIR}/conf/php.ini" "${PHP_PATH}"
 
     echo "-----> Looking for DocumentRoot"
+
+    for sDirectory in ${aPossibleDocumentRoots}; do
+        echo "Checking for existance of '${BUILD_DIR}/${sDirectory}'"
+        if [ -d "${BUILD_DIR}/${sDirectory}" ]; then
+            echo '----- exists'
+        fi
+    done
+
     sDocumentRoot=$(findDocumentRoot)
     if ["${sDocumentRoot}" eq '']; then
         echo "-----> Could not find DocumentRoot"

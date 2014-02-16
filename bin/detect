@@ -18,34 +18,15 @@ BUILD_DIR=$1
 # ==============================================================================
 # Possible Directory Names for the DocumentRoot
 # ------------------------------------------------------------------------------
-declare -a aPossibleDocumentRoots
+#declare -a aPossibleDocumentRoots
 
-aPossibleDocumentRoots+=('www')
-aPossibleDocumentRoots+=('web')
-aPossibleDocumentRoots+=('html')
-aPossibleDocumentRoots+=('public')
+aPossibleDocumentRoots=('www web html public')
 # ==============================================================================
 
 
 ################################################################################
 # FUNCTIONS
 ################################################################################
-# ==============================================================================
-# Output some system information
-# ------------------------------------------------------------------------------
-function echoInfo(){
-    echo '# =============================================================================='
-    #echo "BIN_DIR   = ${BIN_DIR}"
-    echo "BUILD_DIR = ${BUILD_DIR}"
-    #echo "CACHE_DIR = ${CACHE_DIR}"
-    #echo "LP_DIR    = ${LP_DIR}"
-    echo "HOME      = ${HOME}"
-    echo "pwd       = `pwd`"
-    echo "\$2       = ${2}"
-    echo '# ------------------------------------------------------------------------------'
-}
-# ==============================================================================
-
 
 # ==============================================================================
 # Tries to find out if there is a public web dir
@@ -54,7 +35,6 @@ function detectDocumentRoot(){
     bFound=false
 
     for sDirectory in ${aPossibleDocumentRoots}; do
-        echo "Checking for existance of '${BUILD_DIR}/${sDirectory}'"
         if [ -d "${BUILD_DIR}/${sDirectory}" ]; then
             bFound=true
             break
@@ -62,17 +42,14 @@ function detectDocumentRoot(){
     done
 
     if [ ${bFound} == true ]; then
-      echo "Potherca-PHP-true"
-      exit 0
+        echo "Potherca:PHP-app"
+        exit 0
     else
-      echo "Potherca-PHP-false"
-      exit 0
-#      exit 1
+        exit 1
     fi
 }
 # ==============================================================================
 
-echoInfo
 detectDocumentRoot
 
 #EOF
