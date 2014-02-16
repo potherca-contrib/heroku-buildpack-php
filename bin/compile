@@ -137,7 +137,7 @@ function preRun(){
 # ------------------------------------------------------------------------------
 function moveAppToWebRoot(){
     echo "-----> Moving Project Files"
-    echo "       From ${$CACHE_DIR} to " `pwd`
+    echo "       From ${CACHE_DIR} to " `pwd`
 
     mv $CACHE_DIR .
 }
