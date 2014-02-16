@@ -33,24 +33,56 @@
 # ==============================================================================
 # CONFIG
 # ------------------------------------------------------------------------------
-# fail fast
-set -e
-#set -x
+set -e  # fail fast
+#set -x #debug
 # ==============================================================================
 
 
-sTarbalUrl='https://heroku-buildpack-php.s3.amazonaws.com'
+# ==============================================================================
+# Possible Directory Names for the DocumentRoot
+# ------------------------------------------------------------------------------
+declare -a aPossibleDocumentRoots
 
+aPossibleDocumentRoots+=('www')
+aPossibleDocumentRoots+=('web')
+aPossibleDocumentRoots+=('html')
+aPossibleDocumentRoots+=('public')
+# ==============================================================================
+
+
+# ==============================================================================
+# Location to grab binaries from
+# ------------------------------------------------------------------------------
+sTarbalUrl='https://heroku-buildpack-php.s3.amazonaws.com'
+# ==============================================================================
+
+
+# ==============================================================================
+# Versions to grab
+# ------------------------------------------------------------------------------
+APACHE_VERSION="2.2.25"
+MCRYPT_VERSION="2.5.8"
+PHP_VERSION="5.3.27"
+# ==============================================================================
+
+
+# ==============================================================================
 # Heroku Revision.
 #
 # Affixed to all vendored binary output to represent changes to the
 # compilation environment without a change to the upstream version,
 # e.g. PHP 5.3.27 without, and then subsequently with, libmcrypt.
+# ------------------------------------------------------------------------------
 heroku_rev='2'
+# ==============================================================================
 
-APACHE_VERSION="2.2.25"
-MCRYPT_VERSION="2.5.8"
-PHP_VERSION="5.3.27"
+# ==============================================================================
+# ------------------------------------------------------------------------------
+BIN_DIR=$(dirname $0)
+BUILD_DIR=$1
+CACHE_DIR=$2
+LP_DIR=`cd $(dirname $0); cd ..; pwd`
+# ==============================================================================
 
 # ==============================================================================
 # ------------------------------------------------------------------------------
@@ -71,17 +103,10 @@ PHP_URL="${sTarbalUrl}/php-${PHP_VERSION}-${heroku_rev}.tar.gz"
 # ==============================================================================
 
 
-# ==============================================================================
-# ------------------------------------------------------------------------------
-BIN_DIR=$(dirname $0)
-BUILD_DIR=$1
-CACHE_DIR=$2
-LP_DIR=`cd $(dirname $0); cd ..; pwd`
-# ==============================================================================
-
 ################################################################################
 # FUNCTIONS
 ################################################################################
+
 # ==============================================================================
 # Check if a value exists in an array
 # ------------------------------------------------------------------------------
@@ -136,10 +161,8 @@ function preRun(){
 # move app things to www
 # ------------------------------------------------------------------------------
 function moveAppToWebRoot(){
-    echo "-----> Moving Project Files"
-    echo "       From ${CACHE_DIR} to " `pwd`
-
-    mv $CACHE_DIR .
+    echo "-----> Moving Project Files to Build Dir"
+    mv "${CACHE_DIR}" "${BUILD_DIR}"
 }
 # ==============================================================================
 
@@ -181,12 +204,41 @@ function install(){
 
 
 # ==============================================================================
+# Tries to find out the name of the public web dir
+# ------------------------------------------------------------------------------
+function findDocumentRoot(){
+    sDocumentRoot=''
+
+    for sDirectory in ${aPossibleDocumentRoots}; do
+        if [ -d "${BUILD_DIR}/${sDirectory}" ]; then
+            sDocumentRoot=${sDirectory}
+            break
+        fi
+    done
+
+    echo "${sDocumentRoot}"
+}
+# ==============================================================================
+
+# ==============================================================================
 # update config files
 # ------------------------------------------------------------------------------
 function updateConfig(){
+
     echo "-----> Updating config files"
-    cp $LP_DIR/conf/httpd.conf $APACHE_PATH/conf
-    cp $LP_DIR/conf/php.ini php
+    cp "${LP_DIR}/conf/httpd.conf" "${APACHE_PATH}/conf"
+    cp "${LP_DIR}/conf/DocumentRoot.conf" "${APACHE_PATH}/conf"
+    cp "${LP_DIR}/conf/php.ini" "${PHP_PATH}"
+
+    echo "-----> Looking for DocumentRoot"
+    sDocumentRoot=$(findDocumentRoot)
+    if ["${sDocumentRoot} eq '']; then
+        echo "-----> Could not find DocumentRoot"
+    else
+        sDocumentRoot="/app/${sDocumentRoot}/"
+        echo "-----> Updating DocumentRoot in Config File to '${sDocumentRoot}'"
+    echo "DocumentRoot \"${sDocumentRoot}\"" > "${APACHE_PATH}/conf/DocumentRoot.conf"
+    fi
 }
 # ==============================================================================
 

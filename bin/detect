@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
 
 # No need for checks we need to always run
-  echo "Potherca-PHP" && exit 0
+echo "Potherca-PHP" && exit 0
 
