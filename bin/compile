@@ -185,7 +185,7 @@ function setDocumentRoot(){
 # ------------------------------------------------------------------------------
 function moveAppToWebRoot(){
     echo "-----> Copying Project Files to Build Dir"
-    cp "${CACHE_DIR}" "${BUILD_DIR}"
+    cp -R "${CACHE_DIR}" "${BUILD_DIR}"
 }
 # ==============================================================================
 
