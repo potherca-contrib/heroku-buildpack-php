@@ -232,12 +232,12 @@ function updateConfig(){
 
     echo "-----> Looking for DocumentRoot"
     sDocumentRoot=$(findDocumentRoot)
-    if ["${sDocumentRoot} eq '']; then
+    if ["${sDocumentRoot}" eq '']; then
         echo "-----> Could not find DocumentRoot"
     else
         sDocumentRoot="/app/${sDocumentRoot}/"
         echo "-----> Updating DocumentRoot in Config File to '${sDocumentRoot}'"
-    echo "DocumentRoot \"${sDocumentRoot}\"" > "${APACHE_PATH}/conf/DocumentRoot.conf"
+        echo "DocumentRoot \"${sDocumentRoot}\"" > "${APACHE_PATH}/conf/DocumentRoot.conf"
     fi
 }
 # ==============================================================================
