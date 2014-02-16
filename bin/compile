@@ -76,6 +76,7 @@ PHP_VERSION="5.3.27"
 heroku_rev='2'
 # ==============================================================================
 
+
 # ==============================================================================
 # ------------------------------------------------------------------------------
 BIN_DIR=$(dirname $0)
@@ -83,6 +84,7 @@ BUILD_DIR=$1
 CACHE_DIR=$2
 LP_DIR=`cd $(dirname $0); cd ..; pwd`
 # ==============================================================================
+
 
 # ==============================================================================
 # ------------------------------------------------------------------------------
@@ -95,6 +97,7 @@ APACHE_URL="${sTarbalUrl}/apache-${APACHE_VERSION}-${heroku_rev}.tar.gz"
 # ------------------------------------------------------------------------------
 MCRYPT_URL="${sTarbalUrl}/mcrypt-${MCRYPT_VERSION}-${heroku_rev}.tar.gz"
 # ==============================================================================
+
 
 # ==============================================================================
 # ------------------------------------------------------------------------------
@@ -126,6 +129,7 @@ in_array(){
 }
 # ==============================================================================
 
+
 # ==============================================================================
 # Output some system information
 # ------------------------------------------------------------------------------
@@ -146,8 +150,8 @@ function echoInfo(){
 # Prepare for action
 # ------------------------------------------------------------------------------
 function preRun(){
-    #echoInfo
-	echo '=====> Preparing...'
+    echo '=====> Preparing...'
+    echoInfo
     # include .files when moving things around
     shopt -s dotglob
 
@@ -193,6 +197,7 @@ function installMcrypt(){
 }
 # ==============================================================================
 
+
 # ==============================================================================
 # Install PHP
 # ------------------------------------------------------------------------------
@@ -210,6 +215,7 @@ function findDocumentRoot(){
     sDocumentRoot=''
 
     for sDirectory in ${aPossibleDocumentRoots}; do
+        echo "Checking for existance of '${BUILD_DIR}/${sDirectory}'"
         if [ -d "${BUILD_DIR}/${sDirectory}" ]; then
             sDocumentRoot=${sDirectory}
             break
@@ -219,6 +225,7 @@ function findDocumentRoot(){
     echo "${sDocumentRoot}"
 }
 # ==============================================================================
+
 
 # ==============================================================================
 # update config files
@@ -304,7 +311,7 @@ function createBootScript(){
     tail -F /app/apache/logs/error_log &
     tail -F /app/apache/logs/access_log &
     export LD_LIBRARY_PATH=/app/php
-    export PHP_INI_SCAN_DIR=/app/www
+    export PHP_INI_SCAN_DIR=/app/conf
     echo "Launching Apache"
     exec /app/apache/bin/httpd -DNO_DETACH
 EOF
