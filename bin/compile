@@ -10,8 +10,9 @@
 # the web root directory of the application.
 #
 # I don't like that, since I tend to have my applications setup more neatly, so
-# this buildpack will keep the entire application in the project root and only
-# move public content to the web root.
+# this buildpack will keep the entire application AS IS and assumes you have the
+# decency to place your public files in a web root, either named `www` or `web`
+# or `html`.
 #
 # Some notes on Heroku Buildpacks:
 #
@@ -37,17 +38,6 @@ set -e
 #set -x
 # ==============================================================================
 
-
-# ==============================================================================
-# The files in the project root we don't want moved to the root
-# ------------------------------------------------------------------------------
-# @FIXME: Any files that need to remain in /app/www that are not in /app/www/web need to be read from a file in the project
-declare -a aKeep
-#aKeep+=('.buildpacks')
-#aKeep+=('.profile.d')
-#aKeep+=('vendor')
-#aKeep+=('last_pack_release.out')
-# ==============================================================================
 
 sTarbalUrl='https://heroku-buildpack-php.s3.amazonaws.com'
 
@@ -95,7 +85,7 @@ LP_DIR=`cd $(dirname $0); cd ..; pwd`
 # ==============================================================================
 # Check if a value exists in an array
 # ------------------------------------------------------------------------------
-# @param $1 mixed  Needle  
+# @param $1 mixed  Needle
 # @param $2 array  Haystack
 # @return  Success (0) if value exists, Failure (1) otherwise
 # Usage: in_array "$needle" "${haystack[@]}"
@@ -142,41 +132,14 @@ function preRun(){
 # ==============================================================================
 
 
-function keep() {
-    echo "----->     Attempt to move ${1}"
-    if [ -f "www/${1}" ]; then
-      mv -v --target-directory="${HOME}/" "www/${1}"
-    elif [ -d "www/${1}" ]; then
-      mv -v --target-directory="${HOME}/" "www/${1}"
-    else
-        echo "----->          !     FAILED TO MOVE ${1} to ${HOME}"
-    fi
-}
 # ==============================================================================
 # move app things to www
 # ------------------------------------------------------------------------------
 function moveAppToWebRoot(){
     echo "-----> Moving Project Files"
-    mkdir -p $CACHE_DIR/www
+    echo "       From ${$CACHE_DIR} to " `pwd`
 
-    #if [ -d "www/" ]; then
-    #    echo "     -----> Moving `pwd`/www/* to `pwd`"
-    #    #mv -v --target-directory="." "www/*"
-    #    mv -v "./www/*" "./*"
-    #else
-    #    echo "     ERROR> Could not find a 'www' directory in `pwd`"
-    #fi
-
-    for sItem in $( ls ); do
-        in_array "${sItem}" "${aKeep[@]}" || mv "${sItem}" "${CACHE_DIR}/www"
-    done
-
-    mv $CACHE_DIR/www .
-
-    # keep Procfile
-    if [ -f www/Procfile ]; then
-      mv -v www/Procfile .
-    fi
+    mv $CACHE_DIR .
 }
 # ==============================================================================
 
@@ -265,6 +228,8 @@ function runComposer(){
         cd $BUILD_DIR
         rm www/composer.phar
         export GIT_DIR=$GIT_DIR_ORIG
+    else
+        echo "       -----> No Composer dependencies found"
     fi
 }
 # ==============================================================================
@@ -290,7 +255,6 @@ function createBootScript(){
     export PHP_INI_SCAN_DIR=/app/www
     echo "Launching Apache"
     exec /app/apache/bin/httpd -DNO_DETACH
-
 EOF
 
     chmod +x boot.sh
@@ -305,7 +269,7 @@ function postRun(){
 	echo '=====> Cleaning Up'
     # clean the cache
     #rm -rf $CACHE_DIR/*
-} 
+}
 # ==============================================================================
 
 
