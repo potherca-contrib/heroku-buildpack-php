@@ -166,7 +166,7 @@ function preRun(){
 function setDocumentRoot(){
     findDocumentRoot
 
-    if [ "${g_sDocumentRoot}" eq '' ]; then
+    if [ "${g_sDocumentRoot}" == '' ]; then
         echo "-----> Could not find DocumentRoot"
         echo ""
         echo "CAN NOT PROCEED WITHOUT DOCUMENTROOT. ABORTING."
