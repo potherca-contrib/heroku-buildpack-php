@@ -151,7 +151,7 @@ function echoInfo(){
 # ------------------------------------------------------------------------------
 function preRun(){
     echo '=====> Preparing...'
-    echoInfo
+    #echoInfo
     # include .files when moving things around
     shopt -s dotglob
 
@@ -311,7 +311,7 @@ function createBootScript(){
     tail -F /app/apache/logs/error_log &
     tail -F /app/apache/logs/access_log &
     export LD_LIBRARY_PATH=/app/php
-    export PHP_INI_SCAN_DIR=/app/conf
+    export PHP_INI_SCAN_DIR=/app/www
     echo "Launching Apache"
     exec /app/apache/bin/httpd -DNO_DETACH
 EOF
