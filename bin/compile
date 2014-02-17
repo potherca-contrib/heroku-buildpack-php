@@ -189,9 +189,9 @@ function setDocumentRoot(){
 
 
 # ==============================================================================
-# move app things to www
+# move app things from cache to build dir
 # ------------------------------------------------------------------------------
-function moveAppToWebRoot(){
+function moveAppToBuildDirectory(){
     echo "-----> Copying Project Files to Build Dir"
     cp -R "${CACHE_DIR}" "${BUILD_DIR}"
 }
@@ -283,15 +283,14 @@ function linkBinaries(){
 # ------------------------------------------------------------------------------
 function runComposer(){
     echo "-----> Checking for Composer dependencies"
-    if [ -f "/app/composer.json" ] && [ ! -d "/app/vendor" ]; then
+    if [ -f "/app/composer.json" ]; then # && [ ! -d "/app/vendor" ]; then
         echo "              Composer dependencies found"
         COMPOSER_URL="http://getcomposer.org/composer.phar"
         GIT_DIR_ORIG=$GIT_DIR
         unset GIT_DIR
 
         echo "              Fetching Composer"
-        curl --silent --max-time 60 --location "$COMPOSER_URL" > www/composer.phar
-        cd www
+        curl --silent --max-time 60 --location "$COMPOSER_URL" > composer.phar
 
         echo "              Running Composer "
         # @NOTE: We need to point LD_LIBRARY_PATH to where the mcrypt.so is so PHP can find it
@@ -302,7 +301,7 @@ function runComposer(){
         echo "              Cleaning up after Composer"
         rm -rf vendor/**/.git
         cd $BUILD_DIR
-        rm www/composer.phar
+        rm composer.phar
         export GIT_DIR=$GIT_DIR_ORIG
     else
         echo "              No Composer dependencies found"
@@ -329,7 +328,7 @@ function createBootScript(){
     tail -F /app/apache/logs/error_log &
     tail -F /app/apache/logs/access_log &
 
-    export PHP_INI_SCAN_DIR="/app/www"
+    export PHP_INI_SCAN_DIR="/app"
     echo "Launching Apache"
     exec /app/apache/bin/httpd -DNO_DETACH
 EOF
@@ -355,7 +354,7 @@ function postRun(){
 # ------------------------------------------------------------------------------
 function run (){
     echo "=====> Running Install"
-    moveAppToWebRoot
+    moveAppToBuildDirectory
 
     installMcrypt
     installApache
