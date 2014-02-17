@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# bin/compile <build-dir> <cache-dir>
+# bin/compile <BUILD_DIR> <CACHE_DIR>
 
 ################################################################################
 # Potherca Custom Heroku Compile script for PHP apps with Composer Dependencies
@@ -107,7 +107,7 @@ MCRYPT_URL="${sTarbalUrl}/mcrypt-${MCRYPT_VERSION}-${heroku_rev}.tar.gz"
 
 # ==============================================================================
 # ------------------------------------------------------------------------------
-PHP_PATH="php" # @CHECKME: Unused variable. Why?
+PHP_PATH="php"
 PHP_URL="${sTarbalUrl}/php-${PHP_VERSION}-${heroku_rev}.tar.gz"
 # ==============================================================================
 
@@ -158,6 +158,8 @@ function echoInfo(){
 function preRun(){
     echo '=====> Preparing...'
     echoInfo
+
+    mkdir -p "${CACHE_DIR}"
 
     setDocumentRoot
 
