@@ -283,7 +283,7 @@ function linkBinaries(){
 # ------------------------------------------------------------------------------
 function runComposer(){
     echo "-----> Checking for Composer dependencies"
-    if [ -f www/composer.json ] && [ ! -d www/vendor ]; then
+    if [ -f "${g_sDocumentRoot}/composer.json" ] && [ ! -d "${g_sDocumentRoot}/vendor" ]; then
         echo "              Composer dependencies found"
         COMPOSER_URL="http://getcomposer.org/composer.phar"
         GIT_DIR_ORIG=$GIT_DIR
